@@ -78,6 +78,7 @@ class Handler(object):
         result = {
             "FQDN": payload['hostname'],
             "IP": ip,
+            "ID": payload['instance_id'],
             "IPType": "Public",
             "OS": os_name,
             "Storage": payload['disk_gb'],
@@ -85,14 +86,7 @@ class Handler(object):
             "CPU": payload['vcpus'],
             "Datacenter": "KDC",
             "SecurityDomain": "DQT",
-            "Owner": payload['metadata'].get('Owner', None),
-            "AdditionalUsers": payload['metadata'].get('AdditionalUsers',
-                                                       None),
-            "ApplicationName": payload['metadata'].get('ApplicationName',
-                                                       None),
-            "EnvironmentCI": payload['metadata'].get('EnvironmentCI',
-                                                     None),
-            "Description": payload['metadata'].get('Description', None),
+            "Metadata": payload['metadata'],
             "CreationDate": payload['created_at']}
         return result
 
@@ -110,6 +104,7 @@ class Handler(object):
         flavor = self.nova_cli.flavors.get(flavor_id)
         image = self.nova_cli.images.get(instance.image['id'])
         payload.update({
+            'instance_id': instance.id,
             'hostname': instance.name,
             'metadata': instance.metadata,
             'image_meta': image.metadata,
