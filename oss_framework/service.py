@@ -86,8 +86,10 @@ class Handler(object):
             "CPU": payload['vcpus'],
             "Datacenter": "KDC",
             "SecurityDomain": "DQT",
-            "Metadata": payload['metadata'],
             "CreationDate": payload['created_at']}
+        meta = dict((k, v) for k, v in payload['metadata'].iteritems()
+                    if k not in result)
+        result.update(meta)
         return result
 
     def get_data(self, body):
