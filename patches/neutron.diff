@@ -1,0 +1,31 @@
+From 33bb31392af30fd62824440f307d5a0352a161fe Mon Sep 17 00:00:00 2001
+From: Svetlana Shturm <sshturm@mirantis.com>
+Date: Wed, 18 Mar 2015 11:11:59 -0500
+Subject: [PATCH] Add port_id info into notification
+
+Change-Id: I35658776c1d16d3efe754f508298df4c5b601922
+---
+
+diff --git a/neutron/api/v2/base.py b/neutron/api/v2/base.py
+index 53c11b9..93cf17f 100644
+--- a/neutron/api/v2/base.py
++++ b/neutron/api/v2/base.py
+@@ -511,6 +511,9 @@
+         policy.init()
+         orig_obj = self._item(request, id, field_list=field_list,
+                               parent_id=parent_id)
++        port_id = None
++        if 'floatingip' in body:
++            port_id = body['floatingip']['port_id'] or orig_obj.get('port_id')
+         orig_object_copy = copy.copy(orig_obj)
+         orig_obj.update(body[self._resource])
+         # Make a list of attributes to be updated to inform the policy engine
+@@ -537,6 +540,8 @@
+             kwargs[self._parent_id_name] = parent_id
+         obj = obj_updater(request.context, id, **kwargs)
+         result = {self._resource: self._view(request.context, obj)}
++        if port_id is not None:
++            result['port_id'] = port_id
+         notifier_method = self._resource + '.update.end'
+         self._notifier.info(request.context, notifier_method, result)
+         self._send_dhcp_notification(request.context,

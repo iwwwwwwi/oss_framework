@@ -1,0 +1,51 @@
+From d1c686c05d6700bc0be0ad435e2ebbcb59c4498e Mon Sep 17 00:00:00 2001
+From: Svetlana Shturm <sshturm@mirantis.com>
+Date: Wed, 18 Mar 2015 05:57:39 -0500
+Subject: [PATCH] Extend notification in deletion of instance case
+
+Network info is added into notification payload in deletion of
+instance case.
+
+Change-Id: I4e921d75f89f520b03b3a7fc5938441b60023799
+---
+
+diff --git a/nova/compute/manager.py b/nova/compute/manager.py
+index c59548c..d15cc6e 100644
+--- a/nova/compute/manager.py
++++ b/nova/compute/manager.py
+@@ -814,7 +814,7 @@
+                                 instance.system_metadata)
+ 
+     def _complete_deletion(self, context, instance, bdms,
+-                           quotas, system_meta):
++                           quotas, system_meta, network_info=None):
+         if quotas:
+             quotas.commit()
+ 
+@@ -823,7 +823,7 @@
+             bdm.destroy()
+ 
+         self._notify_about_instance_usage(context, instance, "delete.end",
+-                system_metadata=system_meta)
++                system_metadata=system_meta, network_info=network_info)
+ 
+         if CONF.vnc_enabled or CONF.spice.enabled:
+             if CONF.cells.enable:
+@@ -2438,6 +2438,7 @@
+         """
+         instance_uuid = instance['uuid']
+ 
++        nw = self._get_instance_nw_info(context, instance)
+         was_soft_deleted = instance['vm_state'] == vm_states.SOFT_DELETED
+         if was_soft_deleted:
+             # Instances in SOFT_DELETED vm_state have already had quotas
+@@ -2485,7 +2486,8 @@
+                                 instance,
+                                 bdms,
+                                 quotas,
+-                                system_meta)
++                                system_meta,
++                                network_info=nw)
+ 
+     @wrap_exception()
+     @reverts_task_state
