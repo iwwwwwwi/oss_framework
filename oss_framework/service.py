@@ -76,7 +76,7 @@ class Handler(object):
         ip, type_ip = nw_info
         os_name = payload.get('image_meta', {}).get('os', None)
         result = {
-            "FQDN": payload['hostname'],
+            "Hostname": payload['hostname'],
             "IP": ip,
             "ID": payload['instance_id'],
             "IPType": "Public",
