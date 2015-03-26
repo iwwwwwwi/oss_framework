@@ -135,13 +135,14 @@ class Handler(object):
                 get_nw_info = self._get_network_info
             try:
                 nw_info = get_nw_info(payload, created)
-            except Exception:
-                LOG.error("Wrong format of payload in network info.")
+            except Exception as e:
+                LOG.error("Wrong format of payload in network info. "
+                          "Error: %s" % e.message)
                 return
             try:
                 node_detail = self._convert_to_node_detail(payload, nw_info)
-            except Exception:
-                LOG.error("Wrong format of payload.")
+            except Exception as e:
+                LOG.error("Wrong format of payload. Error: %s" % e.message)
                 return
             for plugin in self.plugins:
                 plugin.notify(node_detail, created)
