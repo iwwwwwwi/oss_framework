@@ -180,3 +180,7 @@ def main():
             LOG.warning('Rabbit service is unavailable', exc_info=True)
             time.sleep(10)
             continue
+        except Exception as e:
+            LOG.error("Unexpected error during connection with RabbitMQ. "
+                      " %s" % e.message)
+            break
