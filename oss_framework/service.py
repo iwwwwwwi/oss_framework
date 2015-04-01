@@ -178,9 +178,11 @@ def main():
             channel.start_consuming()
         except (exceptions.AMQPConnectionError, exceptions.ChannelClosed):
             LOG.warning('Rabbit service is unavailable', exc_info=True)
+            LOG.warning("Sleeping 10 seconds.")
             time.sleep(10)
             continue
         except Exception as e:
             LOG.error("Unexpected error during connection with RabbitMQ. "
                       " %s" % e.message)
+            LOG.error("Shutdown of service.")
             break
